@@ -27,10 +27,12 @@ int main(void)
 	signal(SIGWINCH, handle_sigwinch);
 	ft_bzero(&game, sizeof(t_game));
 	initscr();
+	start_color();
 	curs_set(0);
 	cbreak();
 	keypad(stdscr, TRUE);
 	noecho();
+	timeout(100);
 
 	clear();
 	draw(&game);
