@@ -65,6 +65,7 @@ void bitboard_to_grid(t_game* game, size_t i, size_t j);
 void grid_to_bitboard(t_game* game, size_t i, size_t j);
 
 /* ------------------- init ------------------- */
-void init_tables(t_board* board);
+void init_curses(void);
+void init_game(t_game* game);
 
 #endif

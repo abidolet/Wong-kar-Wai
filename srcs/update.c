@@ -2,19 +2,16 @@
 #include <ncurses.h>
 #include <stdlib.h>
 
-static void print_board(t_game* game, size_t i, size_t j)
+/**
+ * @brief Get the empty cells object
+ * 
+ * @param board The game board
+ * @param empty_cells An array to store the indices of empty cells
+ * @return int The number of empty cells
+ */
+int get_empty_cells(uint64_t board, size_t* empty_cells)
 {
-	if (game->board.cells[i][j] == 0)
-		printw("  .  ");
-	else
-		printw("  %zu  ", game->board.cells[i][j]);
-	if (j == game->board.size - 1)
-		printw("\n");
-}
-
-int get_empty_cells(uint64_t board, size_t *empty_cells)
-{
-	size_t	count = 0;
+	size_t count = 0;
 
 	for (size_t i = 0; i < 16; i++)
 	{
@@ -27,12 +24,17 @@ int get_empty_cells(uint64_t board, size_t *empty_cells)
 	return count;
 }
 
-static void	add_number(uint64_t *board)
+/**
+ * @brief Adds a new number to the game board
+ * 
+ * @param board The game board
+ */
+static void add_number(uint64_t* board)
 {
-	size_t		empty_cells[16];
-	size_t		count;
-	size_t		random_idx;
-	uint64_t	tile;
+	size_t empty_cells[16];
+	size_t count;
+	size_t random_idx;
+	uint64_t tile;
 
 	count = get_empty_cells(*board, empty_cells);
 	random_idx = empty_cells[rand() % count];
@@ -41,6 +43,11 @@ static void	add_number(uint64_t *board)
 	*board = *board | (tile << ((u_int64_t)random_idx * 4));
 }
 
+/**
+ * @brief Updates the game state
+ * 
+ * @param game The game instance
+ */
 void update(t_game* game)
 {
 	uint64_t new_board = move_cells(game);
@@ -50,12 +57,13 @@ void update(t_game* game)
 		game->board.bitboard = new_board;
 		add_number(&game->board.bitboard);
 	}
-
-	iter_board(game, bitboard_to_grid);
-	printw("Score: %u\n", game->board.score);
-	iter_board(game, print_board);
 }
 
+/**
+ * @brief Starts a new game
+ * 
+ * @param game The game instance
+ */
 void new_game(t_game* game)
 {
 	game->board.size = 4;
@@ -63,8 +71,4 @@ void new_game(t_game* game)
 
 	add_number(&game->board.bitboard);
 	add_number(&game->board.bitboard);
-
-	iter_board(game, bitboard_to_grid);
-	printw("Score: %u\n", game->board.score);
-	iter_board(game, print_board);
 }

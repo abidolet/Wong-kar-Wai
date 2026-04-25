@@ -3,13 +3,24 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+/**
+ * @brief Reverses the order of the four nibbles in a 16-bit value
+ * 
+ * @param line The line to reverse
+ * @return uint16_t The reversed line
+ */
 static uint16_t reverse_line(uint16_t line)
 {
 	return ((line >> 12) & 0x000F) | ((line >> 4) & 0x00F0)
 		   | ((line << 4) & 0x0F00) | ((line << 12) & 0xF000);
 }
 
-void init_tables(t_board* board)
+/**
+ * @brief Initializes the lookup tables for the game board
+ * 
+ * @param board The game board to initialize
+ */
+static void init_tables(t_board* board)
 {
 	uint16_t* lut_left = board->lut_left;
 
@@ -63,4 +74,32 @@ void init_tables(t_board* board)
 	{
 		board->lut_right[i] = reverse_line(board->lut_left[reverse_line(i)]);
 	}
+}
+
+/**
+ * @brief Initializes the game
+ * 
+ * @param game The game to initialize
+ */
+void init_game(t_game* game)
+{
+	init_tables(&game->board);
+	new_game(game); // TO REMOVE WHEN WE WILL GET MENU
+	draw(game);
+}
+
+/**
+ * @brief Initializes the curses library
+ * 
+ */
+void init_curses(void)
+{
+	initscr();
+	start_color();
+	curs_set(0);
+	cbreak();
+	keypad(stdscr, TRUE);
+	noecho();
+	timeout(100);
+	clear();
 }
