@@ -12,42 +12,59 @@ static void print_board(t_game* game, size_t i, size_t j)
 		printw("\n");
 }
 
-static void get_random_cell(t_game* game, size_t i, size_t j)
+int get_empty_cells(uint64_t board, size_t *empty_cells)
 {
-	if (game->board.cells[i][j] == 0)
+	size_t	count = 0;
+
+	for (size_t i = 0; i < 16; i++)
 	{
-		game->board.empty_cells++;
-		if (rand() % game->board.empty_cells == 0)
+		if (((board >> (i * 4)) & 0xF) == 0)
 		{
-			game->board.x = i;
-			game->board.y = j;
+			empty_cells[count++] = i;
 		}
 	}
+
+	return count;
 }
 
-static void add_number(t_game* game)
+static void	add_number(uint64_t *board)
 {
-	game->board.empty_cells = 0;
-	iter_board(game, get_random_cell);
-	int value = (rand() % 10 == 0) ? 4 : 2;
-	game->board.cells[game->board.x][game->board.y] = value;
+	size_t		empty_cells[16];
+	size_t		count;
+	size_t		random_idx;
+	uint64_t	tile;
+
+	count = get_empty_cells(*board, empty_cells);
+	random_idx = empty_cells[rand() % count];
+	tile = (rand() % 10 == 0) ? 2 : 1;
+
+	*board = *board | (tile << ((u_int64_t)random_idx * 4));
 }
 
 void update(t_game* game)
 {
-	move_cells(game);
-	printw("Score: %zu\n", game->board.score);
+	uint64_t new_board = move_cells(game);
+
+	if (new_board != game->board.bitboard)
+	{
+		game->board.bitboard = new_board;
+		add_number(&game->board.bitboard);
+	}
+
+	iter_board(game, bitboard_to_grid);
+	printw("Score: %u\n", game->board.score);
 	iter_board(game, print_board);
-	add_number(game);
 }
 
 void new_game(t_game* game)
 {
-	ft_bzero(&game->board, sizeof(t_board));
 	game->board.size = 4;
 	game->state = PLAYING;
-	add_number(game);
-	add_number(game);
-	printw("Score: %zu\n", game->board.score);
+
+	add_number(&game->board.bitboard);
+	add_number(&game->board.bitboard);
+
+	iter_board(game, bitboard_to_grid);
+	printw("Score: %u\n", game->board.score);
 	iter_board(game, print_board);
 }

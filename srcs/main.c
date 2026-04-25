@@ -14,13 +14,17 @@ int main(void)
 {
 	t_game game;
 
+	ft_bzero(&game, sizeof(t_game));
 	srand(time(NULL));
 	signal(SIGINT, handle_sigint);
-	ft_bzero(&game, sizeof(t_game));
+
+	init_tables(&game.board);
 	initscr();
 	cbreak();
 	keypad(stdscr, TRUE);
 	noecho();
+	new_game(&game);
+
 	while (game.key != KEY_ESCAPE)
 	{
 		refresh();
