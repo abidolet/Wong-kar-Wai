@@ -1,0 +1,42 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_atoi.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: abidolet <abidolet@student.42lyon.fr>      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/14 17:12:57 by abidolet          #+#    #+#             */
+/*   Updated: 2026/04/23 18:27:12 by abidolet         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "libft/to.h"
+#include "libft/is.h"
+
+/**
+ * @brief Convert a string to an integer.
+ * @param nptr The string to convert.
+ * @return The converted integer, or -1 on error.
+ */
+int	ft_atoi(const char *nptr)
+{
+	long long	res;
+	int			sign;
+
+	if (!nptr)
+		return (-1);
+	res = 0;
+	sign = 1;
+	while (ft_isspace(*nptr))
+		nptr++;
+	if (*nptr == '-' || *nptr == '+')
+		if (*nptr++ == '-')
+			sign = -1;
+	while (ft_isdigit(*nptr))
+	{
+		res = res * 10 + *nptr++ - '0';
+		if (res * sign != (int)(res * sign))
+			return (-1);
+	}
+	return ((int)(res * sign));
+}
