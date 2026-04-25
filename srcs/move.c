@@ -1,129 +1,91 @@
 #include "2048.h"
 #include <ncurses.h>
 
-static size_t unique(size_t* row, size_t size)
+/**
+ * @brief Get the score object
+ * 
+ * @param board The game board
+ * @param lut_score The lookup table for scores
+ * @return uint32_t The total score for the given board
+ */
+uint32_t get_score(uint64_t board, uint32_t* lut_score)
 {
-	size_t k = 0;
+	uint32_t score = 0;
 
-	for (size_t i = 0; i < size; i++)
-	{
-		if (row[i] != 0)
-		{
-			row[k] = row[i];
-			k++;
-		}
-	}
-	return k;
+	score += lut_score[(board >> 0) & 0xFFFF];
+	score += lut_score[(board >> 16) & 0xFFFF];
+	score += lut_score[(board >> 32) & 0xFFFF];
+	score += lut_score[(board >> 48) & 0xFFFF];
+
+	return score;
 }
 
-static void reverse(size_t* row, size_t size)
+/**
+ * @brief Transposes the bits of a 64-bit value
+ * 
+ * @param x The value to transpose
+ * @return uint64_t The transposed value
+ */
+uint64_t transpose(uint64_t x)
 {
-	size_t temp;
+	uint64_t t;
 
-	for (size_t i = 0; i < size / 2; i++)
-	{
-		temp = row[i];
-		row[i] = row[size - 1 - i];
-		row[size - 1 - i] = temp;
-	}
+	t = (x ^ (x >> 12)) & 0x0000F0F00000F0F0ULL;
+	x = x ^ t ^ (t << 12);
+	t = (x ^ (x >> 24)) & 0x00000000FF00FF00ULL;
+	x = x ^ t ^ (t << 24);
+
+	return x;
 }
 
-static void push(t_game* game, size_t* row)
+/**
+ * @brief Get the board object
+ * 
+ * @param board The game board
+ * @param lut The lookup table for board values
+ * @return uint64_t The transposed board after applying the lookup table
+ */
+uint64_t get_board(uint64_t board, uint16_t* lut)
 {
-	size_t k = unique(row, game->board.size);
-	ft_bzero(&row[k], (game->board.size - k) * sizeof(size_t));
+	uint64_t res = 0;
 
-	for (size_t j = 1; j < k; j++)
-	{
-		if (row[j] == row[j - 1])
-		{
-			row[j - 1] *= 2;
-			game->board.score += row[j - 1];
-			row[j] = 0;
-			j++;
-		}
-	}
+	res |= (uint64_t)lut[(board >> 0) & 0xFFFF] << 0;
+	res |= (uint64_t)lut[(board >> 16) & 0xFFFF] << 16;
+	res |= (uint64_t)lut[(board >> 32) & 0xFFFF] << 32;
+	res |= (uint64_t)lut[(board >> 48) & 0xFFFF] << 48;
 
-	k = unique(row, game->board.size);
-	ft_bzero(&row[k], (game->board.size - k) * sizeof(size_t));
+	return res;
 }
 
-static void	get_column(t_game* game, size_t j, size_t* column)
+/**
+ * @brief Moves the cells on the game board
+ * 
+ * @param game The game instance
+ * @return uint64_t The updated board state
+ */
+uint64_t move_cells(t_game* game)
 {
-	for (size_t i = 0; i < game->board.size; i++)
+	bool is_vertical = (game->key == KEY_UP || game->key == KEY_DOWN);
+	uint64_t res = game->board.bitboard;
+	bool is_left = (game->key == KEY_LEFT || game->key == KEY_UP);
+	uint16_t* lut = is_left ? game->board.lut_left : game->board.lut_right;
+
+	if (is_vertical)
 	{
-		column[i] = game->board.cells[i][j];
+		res = transpose(game->board.bitboard);
 	}
-}
 
-static void move_up(t_game* game)
-{
-	for (size_t j = 0; j < game->board.size; j++)
+	res = get_board(res, lut);
+
+	if (is_vertical)
 	{
-		size_t column[4];
-
-		get_column(game, j, column);
-		push(game, column);
-
-		for (size_t i = 0; i < game->board.size; i++)
-		{
-			game->board.cells[i][j] = column[i];
-		}
+		res = transpose(res);
 	}
-}
 
-static void move_down(t_game* game)
-{
-	for (size_t i = 0; i < game->board.size; i++)
+	if (res != game->board.bitboard)
 	{
-		size_t column[4];
-
-		get_column(game, i, column);
-		reverse(column, game->board.size);
-		push(game, column);
-		reverse(column, game->board.size);
-
-		for (size_t j = 0; j < game->board.size; j++)
-		{
-			game->board.cells[j][i] = column[j];
-		}
+		game->board.score += get_score(res, game->board.lut_score);
 	}
-}
 
-static void move_left(t_game* game)
-{
-	for (size_t i = 0; i < game->board.size; i++)
-	{
-		push(game, game->board.cells[i]);
-	}
-}
-
-static void move_right(t_game* game)
-{
-	for (size_t i = 0; i < game->board.size; i++)
-	{
-		size_t* row = game->board.cells[i];
-		reverse(row, game->board.size);
-		push(game, row);
-		reverse(row, game->board.size);
-	}
-}
-
-void move_cells(t_game* game)
-{
-	switch (game->key)
-	{
-	case KEY_UP:
-		move_up(game);
-		break;
-	case KEY_DOWN:
-		move_down(game);
-		break;
-	case KEY_LEFT:
-		move_left(game);
-		break;
-	case KEY_RIGHT:
-		move_right(game);
-		break;
-	}
+	return res;
 }

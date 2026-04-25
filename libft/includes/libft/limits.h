@@ -6,28 +6,44 @@
 /*   By: abidolet <abidolet@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/31 20:55:53 by abidolet          #+#    #+#             */
-/*   Updated: 2026/04/16 00:05:12 by abidolet         ###   ########.fr       */
+/*   Updated: 2026/04/25 16:37:32 by abidolet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIMITS_H
 # define LIMITS_H
 
-# define CHAR_MIN -128
-# define CHAR_MAX 127
-# define UCHAR_MAX 255
+# define INT8_MIN -128
+# define INT8_MAX 127
+# define UINT8_MAX 255
 
-# define SHRT_MIN -32768
-# define SHRT_MAX 32767
-# define USHRT_MAX 65535
+# define CHAR_MIN INT8_MIN
+# define CHAR_MAX INT8_MAX
+# define UCHAR_MAX UINT8_MAX
 
-# define INT_MIN -2147483648
-# define INT_MAX 2147483647
-# define UINT_MAX 4294967295U
+# define INT16_MIN -32768
+# define INT16_MAX 32767
+# define UINT16_MAX 65535
 
-# define LONG_MIN -9223372036854775808L
-# define LONG_MAX 9223372036854775807L
-# define ULONG_MAX 18446744073709551615UL
+# define SHRT_MIN INT16_MIN
+# define SHRT_MAX INT16_MAX
+# define USHRT_MAX UINT16_MAX
+
+# define INT32_MIN -2147483648
+# define INT32_MAX 2147483647
+# define UINT32_MAX 4294967295U
+
+# define INT_MIN INT32_MIN
+# define INT_MAX INT32_MAX
+# define UINT_MAX UINT32_MAX
+
+# define INT64_MIN -9223372036854775808LL
+# define INT64_MAX 9223372036854775807LL
+# define UINT64_MAX 18446744073709551615ULL
+
+# define LONG_MIN INT64_MIN
+# define LONG_MAX INT64_MAX
+# define ULONG_MAX UINT64_MAX
 
 # define FLT_MIN 1.1754943508222875e-38F
 # define FLT_MAX 3.4028234663852886e+38F

@@ -21,6 +21,7 @@ SRCS :=	main.c		\
 		update.c	\
 		utils.c		\
 		move.c		\
+		init.c		\
 
 OBJS := $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
 DEPS := $(OBJS:.o=.d)

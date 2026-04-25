@@ -6,37 +6,32 @@
 
 int g_signal = 0;
 
-static void handle_sigint(int sig)
+static void handle_signal(int sig)
 {
+	if (sig == SIGWINCH)
+	{
+		g_signal = 1;
+		return;
+	}
+
 	endwin();
 	exit(sig);
 }
 
-static void handle_sigwinch(int sig)
+static bool is_key_valid(int key)
 {
-	(void)sig;
-	g_signal = 1;
+	return (key >= KEY_DOWN && key <= KEY_LEFT);
 }
 
 int main(void)
 {
-	t_game game;
+	t_game game = {0};
 
 	srand(time(NULL));
-	signal(SIGINT, handle_sigint);
-	signal(SIGWINCH, handle_sigwinch);
-	ft_bzero(&game, sizeof(t_game));
-	initscr();
-	start_color();
-	curs_set(0);
-	cbreak();
-	keypad(stdscr, TRUE);
-	noecho();
-	timeout(100);
-
-	clear();
-	draw(&game);
-	refresh();
+	signal(SIGINT, handle_signal);
+	signal(SIGWINCH, handle_signal);
+	init_curses();
+	init_game(&game);
 
 	while (game.key != KEY_ESCAPE)
 	{
@@ -44,16 +39,14 @@ int main(void)
 
 		if (g_signal == 1 || game.key == KEY_RESIZE)
 		{
-			endwin(); 
+			endwin();
 			refresh();
 			clear();
 			draw(&game);
 			refresh();
 			g_signal = 0;
 		}
-		else if (game.state == PLAYING && 
-                (game.key == KEY_UP || game.key == KEY_DOWN || 
-                 game.key == KEY_LEFT || game.key == KEY_RIGHT))
+		else if (is_key_valid(game.key) && game.state == PLAYING)
 		{
 			update(&game);
 			clear();
@@ -61,6 +54,7 @@ int main(void)
 			refresh();
 		}
 	}
+
 	endwin();
 	return (0);
 }
