@@ -2,7 +2,11 @@
 
 void	draw(t_game *game)
 {
-	if (game->state == PLAYING)
+	if (game->state != PLAYING)
+	{
+		new_game(game);
+	}
+	else
 	{
 		update(game);
 	}

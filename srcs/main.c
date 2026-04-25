@@ -2,8 +2,9 @@
 #include <curses.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <time.h>
 
-void handle_sigint(int sig)
+static void handle_sigint(int sig)
 {
 	endwin();
 	exit(sig);
@@ -13,6 +14,7 @@ int main(void)
 {
 	t_game game;
 
+	srand(time(NULL));
 	signal(SIGINT, handle_sigint);
 	ft_bzero(&game, sizeof(t_game));
 	initscr();
@@ -23,7 +25,7 @@ int main(void)
 	{
 		refresh();
 		game.key = getch();
-		INFO("Key pressed: %d", game.key);
+		clear();
 		draw(&game);
 	}
 	endwin();

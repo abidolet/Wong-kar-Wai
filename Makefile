@@ -19,6 +19,8 @@ VPATH := srcs
 SRCS :=	main.c		\
 		draw.c		\
 		update.c	\
+		utils.c		\
+		move.c		\
 
 OBJS := $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
 DEPS := $(OBJS:.o=.d)
