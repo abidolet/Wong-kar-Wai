@@ -14,16 +14,16 @@
 
 enum e_const
 {
-	WIN_VALUE = 2048,
+	WIN_VALUE = 16,
 	KEY_ESCAPE = 27
 };
 
 typedef enum e_state
 {
-	MENU = 0,
-	LEADERBOARD,
-	PLAYING,
-	WIN
+	MENU = 1 << __COUNTER__,
+	LEADERBOARD = 1 << __COUNTER__,
+	PLAYING = 1 << __COUNTER__,
+	WIN = 1 << __COUNTER__,
 } t_state;
 
 typedef struct s_board
@@ -38,11 +38,24 @@ typedef struct s_board
 	size_t win_value;
 } t_board;
 
+typedef struct s_draw
+{
+	int	l;
+	int	h;
+	int	max_x;
+	int	max_y;
+	int	tot_w;
+	int	tot_h;
+	int	start_x;
+	int	start_y;
+} t_draw;
+
 typedef struct s_game
 {
 	t_board board;
+	t_draw draw;
 	int key;
-	t_state state;
+	uint8_t state;
 } t_game;
 
 /* -------------------------------------------- */
@@ -55,9 +68,12 @@ void draw(t_game* game);
 /* ------------------ update ------------------ */
 void update(t_game* game);
 void new_game(t_game* game);
+void resize(t_game* game);
 
 /* ------------------ move.c ------------------ */
 uint64_t move_cells(t_game* game);
+uint64_t transpose(uint64_t x);
+uint64_t get_board(uint64_t board, uint16_t* lut);
 
 /* ------------------- utils ------------------ */
 void iter_board(t_game* game, void (*f)(t_game*, size_t, size_t));
@@ -65,7 +81,6 @@ void bitboard_to_grid(t_game* game, size_t i, size_t j);
 void grid_to_bitboard(t_game* game, size_t i, size_t j);
 
 /* ------------------- init ------------------- */
-void init_curses(void);
-void init_game(t_game* game);
+void init(t_game *game);
 
 #endif

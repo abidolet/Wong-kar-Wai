@@ -119,37 +119,161 @@ void	fill_cells(t_board* board, int start_x, int start_y, int h, int l)
 	}
 }
 
+void draw_game(t_draw* draw, t_board* board)
+{
+	draw->l = 8;
+	draw->h = 5;
+
+	draw->tot_w = draw->l * board->size + board->size + 1;
+	draw->tot_h = draw->h * board->size + board->size + 1;
+	if (draw->max_x < draw->tot_w || draw->max_y < draw->tot_h + 2)
+	{
+		mvprintw(draw->max_y / 2, (draw->max_x - 18) / 2, "Terminal too small");
+		return ;
+	}
+
+	draw->start_x = (draw->max_x - draw->tot_w) / 2;
+	draw->start_y = (draw->max_y - draw->tot_h) / 2;
+
+	if (draw->start_y < 2)
+		draw->start_y = 2;
+	get_skeleton_line(draw->start_x, draw->start_y, draw->h, draw->l, draw->tot_h, draw->tot_w);
+	fill_cells(board, draw->start_x, draw->start_y, draw->h, draw->l);
+}
+
+static bool is_terminal_too_small(t_draw* draw)
+{
+	return (draw->max_x < draw->tot_w || draw->max_y < draw->tot_h + 2);
+}
+
+static void draw_end(t_game* game)
+{
+	
+	if (game->state & WIN)
+	{
+		printw("You won! But you cannot continue playing!");
+		// the user has won the game but cannot continue playing, so we show the win screen
+	}
+	else
+	{
+		printw("You lose!");
+		// the user has lost the game, so we show the game over screen
+	}
+
+	game->state = MENU;
+}
+
+static void draw_win(t_game* game)
+{
+	printw("You won!");	
+
+	// user must decide either return to the menu or continue the game
+
+	// if the user wants to return to the menu
+	game->state = MENU;
+
+	// if the user wants to continue the game
+	game->state |= PLAYING;
+}
+
+static void draw_leaderboard(t_game* game)
+{
+	// TODO
+
+	// need to add an option to come back to the menu from the leaderboard
+
+	// if the user wants to come back to the menu
+	game->state = MENU;
+}
+
+static void draw_menu(t_game* game)
+{
+	static int selected_option = 0;
+
+	if (game->key == KEY_UP)
+	{
+		selected_option = (selected_option - 1 + 3) % 3;
+	}
+	else if (game->key == KEY_DOWN)
+	{
+		selected_option = (selected_option + 1) % 3;
+	}
+	else if (game->key == KEY_ENTER || game->key == '\n'  || game->key == '\r')
+	{
+		if (selected_option == 0)
+		{
+			new_game(game);
+			draw_game(&game->draw, &game->board);
+			return ;
+		}
+		else if (selected_option == 1)
+		{
+			game->state = LEADERBOARD;
+		}
+		else
+		{
+			game->key = KEY_ESCAPE;
+		}
+	}
+
+	// need to draw the menu options
+	mvprintw(game->draw.max_y / 2 - 1, (game->draw.max_x - 16) / 2, "Start New Game");
+	mvprintw(game->draw.max_y / 2, (game->draw.max_x - 16) / 2, "View Leaderboard");
+	mvprintw(game->draw.max_y / 2 + 1, (game->draw.max_x - 16) / 2, "Exit");
+
+	// highlight the selected option
+}
+
 void	draw(t_game* game)
 {
-	int	l = 8;
-	int	h = 5;
-	int	max_x;
-	int	max_y;
-	int	tot_w;
-	int	tot_h;
-	int	start_x;
-	int	start_y;
-
-	// new_game(game);
-	iter_board(game, bitboard_to_grid);
-
-	getmaxyx(stdscr, max_y, max_x);
-	tot_w = l * game->board.size + game->board.size + 1;
-	tot_h = h * game->board.size + game->board.size + 1;
+	t_board* board = &game->board;
+	t_draw* draw = &game->draw;
 
 	clear();
 
-	if (max_x < tot_w || max_y < tot_h + 2)
-		mvprintw(max_y / 2, (max_x - 18) / 2, "Terminal too small");
+	getmaxyx(stdscr, draw->max_y, draw->max_x);
+	draw->l = 8;
+	draw->h = 5;
+	draw->tot_w = draw->l * game->board.size + game->board.size + 1;
+	draw->tot_h = draw->h * game->board.size + game->board.size + 1;
+
+	ft_dprintf(2, "Game state: %u\n", game->state);
+
+	clear();
+
+	if (is_terminal_too_small(draw))
+	{
+		mvprintw(draw->max_y / 2, (draw->max_x - 18) / 2, "Terminal too small");
+	}
+	else if (game->state & MENU)
+	{
+		draw_menu(game);
+	}
+	else if (game->state & LEADERBOARD)
+	{
+		draw_leaderboard(game);
+	}
+	else if (game->state & WIN && !(game->state & PLAYING))
+	{
+		draw_win(game);
+	}
+	else if (game->state & PLAYING)
+	{
+		draw_game(draw, board);
+	}
 	else
 	{
-		start_x = (max_x - tot_w) / 2;
-		start_y = (max_y - tot_h) / 2;
-
-		if (start_y < 2)
-			start_y = 2;
-
-		get_skeleton_line(start_x, start_y, h, l, tot_h, tot_w);
-		fill_cells(&game->board, start_x, start_y, h, l);
+		draw_end(game);
 	}
+
+	refresh();
+}
+
+void resize(t_game* game)
+{
+	endwin();
+	refresh();
+	clear();
+	draw(game);
+	refresh();
 }

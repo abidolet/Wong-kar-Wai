@@ -76,23 +76,30 @@ static void init_tables(t_board* board)
 	}
 }
 
-/**
- * @brief Initializes the game
- * 
- * @param game The game to initialize
- */
-void init_game(t_game* game)
+static bool is_power_of_two(size_t n)
 {
-	init_tables(&game->board);
-	new_game(game); // TO REMOVE WHEN WE WILL GET MENU
-	draw(game);
+	return (n > 0) && ((n & (n - 1)) == 0);
+}
+
+static void init_win_value(t_game* game)
+{
+	if (is_power_of_two(WIN_VALUE))
+	{
+		game->board.win_value = WIN_VALUE;
+	}
+	else
+	{
+		game->board.win_value = 2048;
+	}
+
+	ft_dprintf(2, "Win value set to %zu\n", game->board.win_value);
 }
 
 /**
  * @brief Initializes the colors of the tiles
  * 
  */
-void init_game_colors(void)
+static void init_game_colors(void)
 {
     // init_pair(PAIR_ID, TEXT_COLOR, BACKGROUND_COLOR);
     
@@ -123,7 +130,7 @@ void init_game_colors(void)
  * @brief Initializes the curses library
  * 
  */
-void init_curses(void)
+static void init_curses(void)
 {
 	initscr();
 	start_color();
@@ -133,5 +140,13 @@ void init_curses(void)
 	keypad(stdscr, TRUE);
 	noecho();
 	timeout(100);
-	clear();
+}
+
+void init(t_game *game)
+{
+	init_curses();
+	init_win_value(game);
+	init_tables(&game->board);
+	game->state = MENU;
+	draw(game);
 }

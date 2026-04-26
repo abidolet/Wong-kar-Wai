@@ -18,10 +18,15 @@ static void handle_signal(int sig)
 	exit(sig);
 }
 
+static bool is_arrow_key(int key)
+{
+	return (key == KEY_DOWN || key == KEY_UP || key == KEY_RIGHT || key == KEY_LEFT);
+}
+
 static bool is_key_valid(int key)
 {
-	return (key == KEY_DOWN || key == KEY_UP || key == KEY_RIGHT
-			|| key == KEY_LEFT);
+	return (is_arrow_key(key) || key == KEY_ENTER || key == '\n'
+			|| key == '\r');
 }
 
 int main(void)
@@ -31,8 +36,7 @@ int main(void)
 	srand(time(NULL));
 	signal(SIGINT, handle_signal);
 	signal(SIGWINCH, handle_signal);
-	init_curses();
-	init_game(&game);
+	init(&game);
 
 	while (game.key != KEY_ESCAPE)
 	{
@@ -40,19 +44,17 @@ int main(void)
 
 		if (g_signal == 1 || game.key == KEY_RESIZE)
 		{
-			endwin();
-			refresh();
-			clear();
-			draw(&game);
-			refresh();
+			resize(&game);
 			g_signal = 0;
 		}
-		else if (is_key_valid(game.key) && game.state == PLAYING)
+		else if (is_key_valid(game.key))
 		{
-			update(&game);
-			clear();
+			if (is_arrow_key(game.key) && (game.state & PLAYING))
+			{
+				update(&game);
+			}
+
 			draw(&game);
-			refresh();
 		}
 	}
 
