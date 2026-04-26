@@ -66,7 +66,6 @@ void update(t_game* game)
  */
 void new_game(t_game* game)
 {
-	game->board.size = 4;
 	game->state = PLAYING;
 
 	add_number(&game->board.bitboard);

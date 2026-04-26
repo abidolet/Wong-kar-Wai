@@ -42,6 +42,7 @@ typedef struct s_game
 {
 	t_board board;
 	int key;
+	int	selected_button;
 	t_state state;
 } t_game;
 
@@ -51,6 +52,11 @@ typedef struct s_game
 
 /* ------------------ draw.c ------------------ */
 void draw(t_game* game);
+
+/* -------------- draw_screens.c -------------- */
+void draw_menu(t_game *game, int max_x, int max_y);
+void draw_win_screen(t_game *game, int max_x, int max_y);
+void draw_end_screen(t_game *game, int max_x, int max_y);
 
 /* ------------------ update ------------------ */
 void update(t_game* game);

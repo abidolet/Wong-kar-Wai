@@ -161,12 +161,12 @@ void	draw(t_game *game)
 	{
 		draw_game_grid(game, max_x, max_y);
 	}
-	else if (game->state == WIN)
-	{
-		draw_win_screen(game, max_x, max_y);
-	}
-	else if (game->state == END_LOOSE || game->state == END_WIN)
-	{
-		draw_end_screen(game, max_x, max_y);
-	}
+	// else if (game->state == WIN)
+	// {
+	// 	draw_win_screen(game, max_x, max_y);
+	// }
+	// else if (game->state == END_LOOSE || game->state == END_WIN)
+	// {
+	// 	draw_end_screen(game, max_x, max_y);
+	// }
 }

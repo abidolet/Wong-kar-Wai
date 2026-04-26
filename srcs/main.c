@@ -47,6 +47,24 @@ int main(void)
 			refresh();
 			g_signal = 0;
 		}
+		else if (game.state == MENU)
+		{
+			if (game.key == KEY_UP || game.key == KEY_DOWN)
+			{
+				game.selected_button = (game.selected_button == 0) ? 1 : 0;
+				clear();
+				draw(&game);
+				refresh();
+			}
+			else if (game.key == 10) 
+			{
+				game.board.size = (game.selected_button == 0) ? 4 : 5;
+				new_game(&game);
+				clear();
+				draw(&game);
+				refresh();
+			}
+		}
 		else if (is_key_valid(game.key) && game.state == PLAYING)
 		{
 			update(&game);
