@@ -14,7 +14,7 @@
 
 enum e_const
 {
-	WIN_VALUE = 16,
+	WIN_VALUE = 2048,
 	KEY_ESCAPE = 27
 };
 
@@ -64,6 +64,10 @@ typedef struct s_game
 
 /* ------------------ draw.c ------------------ */
 void draw(t_game* game);
+void draw_game(t_draw* draw, t_board* board);
+
+/* -------------- draw_screens.c -------------- */
+void draw_menu(t_game* game);
 
 /* ------------------ update ------------------ */
 void update(t_game* game);

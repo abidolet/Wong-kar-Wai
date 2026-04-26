@@ -92,7 +92,7 @@ void	draw_single_cell(t_board *board, int i, int j, int start_x, int start_y, in
     }
 
     cell_y = start_y + i * (h + 1) + 1 + (h / 2);
-    cell_x = start_x + j * (l + 1) + 1;
+    cell_x = start_x + j * (l + 1) + 1 + ((l - num_len) / 2);
     mvprintw(cell_y, cell_x, "%zu", board->cells[i][j]);
 
     attroff(COLOR_PAIR(color_id));
@@ -184,44 +184,6 @@ static void draw_leaderboard(t_game* game)
 
 	// if the user wants to come back to the menu
 	game->state = MENU;
-}
-
-static void draw_menu(t_game* game)
-{
-	static int selected_option = 0;
-
-	if (game->key == KEY_UP)
-	{
-		selected_option = (selected_option - 1 + 3) % 3;
-	}
-	else if (game->key == KEY_DOWN)
-	{
-		selected_option = (selected_option + 1) % 3;
-	}
-	else if (game->key == KEY_ENTER || game->key == '\n'  || game->key == '\r')
-	{
-		if (selected_option == 0)
-		{
-			new_game(game);
-			draw_game(&game->draw, &game->board);
-			return ;
-		}
-		else if (selected_option == 1)
-		{
-			game->state = LEADERBOARD;
-		}
-		else
-		{
-			game->key = KEY_ESCAPE;
-		}
-	}
-
-	// need to draw the menu options
-	mvprintw(game->draw.max_y / 2 - 1, (game->draw.max_x - 16) / 2, "Start New Game");
-	mvprintw(game->draw.max_y / 2, (game->draw.max_x - 16) / 2, "View Leaderboard");
-	mvprintw(game->draw.max_y / 2 + 1, (game->draw.max_x - 16) / 2, "Exit");
-
-	// highlight the selected option
 }
 
 void	draw(t_game* game)

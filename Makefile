@@ -16,12 +16,13 @@ endif
 
 VPATH := srcs
 
-SRCS :=	main.c		\
-		draw.c		\
-		update.c	\
-		utils.c		\
-		move.c		\
-		init.c		\
+SRCS :=	main.c			\
+		draw.c			\
+		draw_screens.c	\
+		update.c		\
+		utils.c			\
+		move.c			\
+		init.c			\
 
 OBJS := $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
 DEPS := $(OBJS:.o=.d)
