@@ -20,7 +20,8 @@ static void handle_signal(int sig)
 
 static bool is_key_valid(int key)
 {
-	return (key >= KEY_DOWN && key <= KEY_LEFT);
+	return (key == KEY_DOWN || key == KEY_UP || key == KEY_RIGHT
+			|| key == KEY_LEFT);
 }
 
 int main(void)

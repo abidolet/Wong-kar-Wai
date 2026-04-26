@@ -93,7 +93,7 @@ void	draw_single_cell(t_board *board, int i, int j, int start_x, int start_y, in
 
     cell_y = start_y + i * (h + 1) + 1 + (h / 2);
     cell_x = start_x + j * (l + 1) + 1;
-    mvprintw(cell_y, cell_x, "%zu", l, board->cells[i][j]);
+    mvprintw(cell_y, cell_x, "%zu", board->cells[i][j]);
 
     attroff(COLOR_PAIR(color_id));
 }
