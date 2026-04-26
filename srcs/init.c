@@ -84,7 +84,6 @@ static void init_tables(t_board* board)
 void init_game(t_game* game)
 {
 	init_tables(&game->board);
-	new_game(game); // TO REMOVE WHEN WE WILL GET MENU
 	draw(game);
 }
 

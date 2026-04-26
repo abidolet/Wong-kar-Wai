@@ -119,37 +119,54 @@ void	fill_cells(t_board* board, int start_x, int start_y, int h, int l)
 	}
 }
 
-void	draw(t_game* game)
+void	draw_game_grid(t_game *game, int max_x, int max_y)
 {
 	int	l = 8;
 	int	h = 5;
-	int	max_x;
-	int	max_y;
 	int	tot_w;
 	int	tot_h;
 	int	start_x;
 	int	start_y;
-
-	// new_game(game);
-	iter_board(game, bitboard_to_grid);
-
-	getmaxyx(stdscr, max_y, max_x);
+	
 	tot_w = l * game->board.size + game->board.size + 1;
 	tot_h = h * game->board.size + game->board.size + 1;
 
-	clear();
-
 	if (max_x < tot_w || max_y < tot_h + 2)
-		mvprintw(max_y / 2, (max_x - 18) / 2, "Terminal too small");
-	else
 	{
-		start_x = (max_x - tot_w) / 2;
-		start_y = (max_y - tot_h) / 2;
+		mvprintw(max_y / 2, (max_x - 18) / 2, "Terminal too small");
+		return ;
+	}
+	start_x = (max_x - tot_w) / 2;
+	start_y = (max_y - tot_h) / 2;
 
-		if (start_y < 2)
-			start_y = 2;
+	if (start_y < 2)
+		start_y = 2;
 
-		get_skeleton_line(start_x, start_y, h, l, tot_h, tot_w);
-		fill_cells(&game->board, start_x, start_y, h, l);
+	get_skeleton_line(start_x, start_y, h, l, tot_h, tot_w);
+	fill_cells(&game->board, start_x, start_y, h, l);
+}
+
+void	draw(t_game *game)
+{
+	int	max_x;
+	int	max_y;
+
+	getmaxyx(stdscr, max_y, max_x);
+
+	if (game->state == MENU)
+	{
+		draw_menu(game, max_x, max_y);
+	}
+	else if (game->state == PLAYING)
+	{
+		draw_game_grid(game, max_x, max_y);
+	}
+	else if (game->state == WIN)
+	{
+		draw_win_screen(game, max_x, max_y);
+	}
+	else if (game->state == END_LOOSE || game->state == END_WIN)
+	{
+		draw_end_screen(game, max_x, max_y);
 	}
 }
