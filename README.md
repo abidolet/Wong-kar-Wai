@@ -16,11 +16,6 @@ A terminal-based recreation of the [2048](https://github.com/gabrielecirulli/204
 
 ## Build
 
-### Requirements
-
-- A C compiler (`cc` / `gcc` / `clang`)
-- [`ncurses`](https://invisible-island.net/ncurses/) development library
-
 **Linux (Debian/Ubuntu)**
 ```bash
 sudo apt-get install libncurses5-dev libncursesw5-dev
