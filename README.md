@@ -16,6 +16,8 @@ A terminal-based recreation of the [2048](https://github.com/gabrielecirulli/204
 
 ## Build
 
+### Requirements
+
 **Linux (Debian/Ubuntu)**
 ```bash
 sudo apt-get install libncurses5-dev libncursesw5-dev
