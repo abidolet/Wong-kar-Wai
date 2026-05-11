@@ -14,7 +14,7 @@ A terminal-based recreation of the [2048](https://github.com/gabrielecirulli/204
 
 ---
 
-## Build
+## Build  
 
 ### Requirements
 
