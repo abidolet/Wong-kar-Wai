@@ -4,34 +4,44 @@
 #include <stdlib.h>
 #include <time.h>
 
-static void handle_sigint(int sig)
+int g_signal = 0;
+
+static void handle_signal(int sig)
 {
-	endwin();
-	exit(sig);
+	g_signal = sig;
 }
 
 int main(void)
 {
-	t_game game;
+	t_game game = {0};
 
-	ft_bzero(&game, sizeof(t_game));
 	srand(time(NULL));
-	signal(SIGINT, handle_sigint);
-
-	init_tables(&game.board);
-	initscr();
-	cbreak();
-	keypad(stdscr, TRUE);
-	noecho();
-	new_game(&game);
+	signal(SIGINT, handle_signal);
+	signal(SIGWINCH, handle_signal);
+	init(&game);
 
 	while (game.key != KEY_ESCAPE)
 	{
-		refresh();
 		game.key = getch();
-		clear();
-		draw(&game);
+
+		if (g_signal == SIGWINCH || game.key == KEY_RESIZE)
+		{
+			resize(&game);
+			g_signal = 0;
+		}
+		else if (g_signal != 0)
+		{
+			break ;
+		}
+		else
+		{
+			handle_input(&game);
+			clear();
+			draw(&game);
+			refresh();
+		}
 	}
+
 	endwin();
 	return (0);
 }

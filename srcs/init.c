@@ -1,66 +1,81 @@
 #include "2048.h"
+#include <fcntl.h>
 #include <ncurses.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <unistd.h>
 
-static uint16_t reverse_line(uint16_t line)
+/**
+ * @brief Checks if a number is a power of two
+ * 
+ * @param n The number to check
+ * @return true if the number is a power of two, false otherwise
+ */
+static bool is_power_of_two(size_t n)
 {
-	return ((line >> 12) & 0x000F) | ((line >> 4) & 0x00F0)
-		   | ((line << 4) & 0x0F00) | ((line << 12) & 0xF000);
+	return (n > 0) && ((n & (n - 1)) == 0);
 }
 
-void init_tables(t_board* board)
+/**
+ * @brief Initializes the win value for the game
+ * 
+ * @param game The game structure to initialize
+ */
+static void init_win_value(t_game* game)
 {
-	uint16_t* lut_left = board->lut_left;
-
-	for (uint32_t i = 0; i <= UINT16_MAX; i++)
+	if (is_power_of_two(WIN_VALUE))
 	{
-		uint16_t line[4];
-		uint32_t score = 0;
-
-		for (size_t j = 0; j < 4; j++)
-		{
-			line[j] = (i >> (j * 4)) & 0xF;
-		}
-
-		for (size_t j = 0; j < 3; j++)
-		{
-			int next;
-
-			for (next = j + 1; next < 4; next++)
-			{
-				if (line[next] != 0)
-				{
-					break;
-				}
-			}
-
-			if (next == 4)
-			{
-				break;
-			}
-
-			if (line[j] == 0)
-			{
-				line[j] = line[next];
-				line[next] = 0;
-				j--;
-			}
-			else if (line[j] == line[next] && line[j] < 0xF)
-			{
-				line[j]++;
-				line[next] = 0;
-				score += (1 << line[j]);
-			}
-		}
-
-		lut_left[i] = (line[0] << 0) | (line[1] << 4) | (line[2] << 8)
-					  | (line[3] << 12);
-		board->lut_score[i] = score;
+		game->board.win_value = WIN_VALUE;
 	}
-
-	for (uint32_t i = 0; i <= UINT16_MAX; i++)
+	else
 	{
-		board->lut_right[i] = reverse_line(board->lut_left[reverse_line(i)]);
+		game->board.win_value = 2048;
 	}
+}
+
+/**
+ * @brief Initializes the colors of the tiles
+ * 
+ */
+static void init_game_colors(void)
+{
+	for (int i = 1; i <= 26; i++)
+	{
+		short r = 1000;
+		short g = 1000 - (i * 80);
+		short b = 1000 - (i * 150);
+
+		init_color(100 + i, r, g, b);
+		init_pair(i, COLOR_BLACK, 100 + i);
+	}
+}
+
+/**
+ * @brief Initializes the curses library
+ *
+ */
+static void init_curses(void)
+{
+	initscr();
+	start_color();
+	init_game_colors();
+	init_pair(100, COLOR_BLACK, COLOR_WHITE);
+	curs_set(0);
+	cbreak();
+	keypad(stdscr, TRUE);
+	noecho();
+	timeout(100);
+}
+
+/**
+ * @brief Initializes the game
+ * 
+ * @param game The game structure to initialize
+ */
+void init(t_game* game)
+{
+	init_curses();
+	init_win_value(game);
+	game->state = MENU;
+	draw(game);
 }

@@ -16,12 +16,16 @@ endif
 
 VPATH := srcs
 
-SRCS :=	main.c		\
-		draw.c		\
-		update.c	\
-		utils.c		\
-		move.c		\
-		init.c		\
+SRCS := draw_leaderboard.c	\
+		draw_screens.c		\
+		draw.c				\
+		init.c				\
+		input.c				\
+		leaderboard.c		\
+		main.c				\
+		move.c				\
+		update.c			\
+		utils.c				\
 
 OBJS := $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
 DEPS := $(OBJS:.o=.d)
@@ -40,10 +44,6 @@ all:
 
 libft:
 	$(MAKE) -C libft 1>/dev/null
-
-debug:
-	$(MAKE) -C libft debug
-	$(MAKE) MODE=debug all
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) libft/libft.a -o $@ $(LDFLAGS)
@@ -65,7 +65,7 @@ fclean:
 
 re: fclean all
 
-.PHONY: all libft debug clean fclean re
+.PHONY: all libft clean fclean re
 
 ifeq ($(PRETTY), 1)
 .SILENT:
